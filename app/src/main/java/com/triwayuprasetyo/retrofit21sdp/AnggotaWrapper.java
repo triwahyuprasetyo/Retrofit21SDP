@@ -22,8 +22,6 @@ public class AnggotaWrapper {
     }
 
     public static class Anggota {
-
-
         @Expose
         @SerializedName("id")
         private String id;

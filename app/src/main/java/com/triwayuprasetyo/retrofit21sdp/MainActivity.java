@@ -1,11 +1,14 @@
 package com.triwayuprasetyo.retrofit21sdp;
 
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.Toast;
 
 import retrofit2.Call;
@@ -16,7 +19,10 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class MainActivity extends AppCompatActivity {
 
+    private ListView listAnggota;
+    private ProgressDialog pd;
     private Button buttonAddAnggota;
+    private String[] daftarNama;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,6 +38,19 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        listAnggota = (ListView) findViewById(R.id.list_anggota);
+
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        Toast.makeText(getApplicationContext(), "OnResume", Toast.LENGTH_SHORT).show();
+        Log.i("SDP RETROFIT ","ON RESUME");
+        getDataAnggota();
+    }
+
+    private void getDataAnggota() {
         Retrofit retrofit = new Retrofit.Builder()
                 .baseUrl("http://triwahyuprasetyo.xyz/")
                 .addConverterFactory(GsonConverterFactory.create())
@@ -44,7 +63,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<AnggotaWrapper> call, Response<AnggotaWrapper> response) {
                 Toast.makeText(getApplicationContext(), "Success : " + response.message(), Toast.LENGTH_SHORT).show();
-
+                daftarNama = new String[response.body().getAnggota().size()];
+                int i = 0;
                 for (AnggotaWrapper.Anggota anggota : response.body().getAnggota()) {
                     Log.d("SDP", "Anggota :: " + anggota.getId());
                     Log.d("SDP", "Anggota :: " + anggota.getNama());
@@ -52,7 +72,10 @@ public class MainActivity extends AppCompatActivity {
                     Log.d("SDP", "Anggota :: " + anggota.getUsername());
                     Log.d("SDP", "Anggota :: " + anggota.getPassword());
                     Log.d("SDP", "=======================================");
+                    daftarNama[i] = anggota.getNama();
+                    i++;
                 }
+                listAnggota.setAdapter(new ArrayAdapter(MainActivity.this, android.R.layout.simple_list_item_1, daftarNama));
             }
 
             @Override
